@@ -1,4 +1,4 @@
-import { FLOWS, SONGS } from "../data/songs.js";
+import { FLOWS, SONGS } from "../data/songs.js?v=20260620-antes-verso";
 import { transposeChord, transposeKey, prettyChord } from "./chords.js";
 import { ICONS } from "./icons.js";
 
@@ -6,7 +6,7 @@ const SPEEDS = [0.5, 1, 1.5, 2, 3];
 
 const state = {
   current: 0,
-  expanded: true,
+  expanded: false,
   fontStep: 0,
   lastTouchX: 0,
   lastTouchY: 0,
@@ -31,8 +31,8 @@ function escapeHtml(value) {
 
 function repeatCount(rep) {
   if (!rep) return 1;
-  const match = rep.match(/x\s*(\d+)/i);
-  return match ? parseInt(match[1], 10) : 1;
+  const match = rep.match(/(?:x|×)\s*(\d+)|(\d+)\s*(?:x|×)/i);
+  return match ? parseInt(match[1] || match[2], 10) : 1;
 }
 
 function updateIcons() {
@@ -97,24 +97,32 @@ function buildPlayCount(song) {
   }, {});
 }
 
-function renderBars(bars) {
-  let previousReal = null;
+function renderBar(bar, context) {
+  if (bar === "%") {
+    return `<div class="bar rep" title="repetir compás (${context.previousReal || ""})">&#37;</div>`;
+  }
 
-  return bars
-    .map((bar) => {
-      if (bar === "%") {
-        return `<div class="bar rep" title="repetir compás (${previousReal || ""})">&#37;</div>`;
-      }
+  const transposed = transposeChord(bar, state.offset);
+  context.previousReal = transposed;
+  return `<div class="bar">${prettyChord(transposed)}</div>`;
+}
 
-      const transposed = transposeChord(bar, state.offset);
-      previousReal = transposed;
-      return `<div class="bar">${prettyChord(transposed)}</div>`;
-    })
-    .join("");
+function renderBars(bars, repeat = 1) {
+  const context = { previousReal: null };
+
+  if (repeat > 1) {
+    const groupBarsHtml = bars.map((bar) => renderBar(bar, context)).join("");
+    return `<div class="bar-phrase">
+      <div class="bar-phrase-bars">${groupBarsHtml}</div>
+      <span class="bar-phrase-repeat">×${repeat}</span>
+    </div>`;
+  }
+
+  return bars.map((bar) => renderBar(bar, context)).join("");
 }
 
 function renderSongHeader(song) {
-  $("#songTitleTop .t").textContent = song.title;
+  $("#songTitleTop .t").textContent = `${state.current + 1}. ${song.title}`;
   $("#songTitleTop .a").textContent = song.artist || "";
 
   const head = $("#songHead");
@@ -165,20 +173,22 @@ function renderSections(song) {
     const order = state.expanded ? `<span class="ord">${index + 1}</span>` : "";
     const count = playCount[section.name];
     const countTag = count > 1 ? `<span class="rep count">suena ${count}×</span>` : "";
-    const repTag = section.rep ? `<span class="rep">${escapeHtml(section.rep)}</span>` : "";
+    const sectionRepeat = repeatCount(section.rep);
+    const repTag = section.rep && sectionRepeat === 1 ? `<span class="rep">${escapeHtml(section.rep)}</span>` : "";
 
     let inner = `<div class="sname">${order}${escapeHtml(section.name)} ${countTag}${repTag}</div>`;
     if (section.note) inner += `<div class="snote">${escapeHtml(section.note)}</div>`;
 
     if (section.parts) {
       section.parts.forEach((part) => {
+        const partRepeat = repeatCount(part.rep);
         inner += `<div class="part">
             <div class="plabel">${escapeHtml(part.label)}</div>
-            <div class="bars">${renderBars(part.bars)}</div>
+            <div class="bars">${renderBars(part.bars, partRepeat)}</div>
           </div>`;
       });
     } else {
-      inner += `<div class="bars">${renderBars(section.bars)}</div>`;
+      inner += `<div class="bars">${renderBars(section.bars, sectionRepeat)}</div>`;
     }
 
     wrap.innerHTML = inner;

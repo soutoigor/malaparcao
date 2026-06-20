@@ -85,6 +85,11 @@
   .section .rep{font-size:.92rem;color:var(--muted);font-weight:700;}
   .section .rep.count{color:var(--accent);}
   .bars{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .bar-phrase{display:flex;align-items:stretch;gap:.35rem;flex:0 1 auto;}
+  .bar-phrase-bars{display:flex;flex-wrap:wrap;gap:.5rem;padding:.18rem;border:2px solid var(--accent);border-radius:14px;}
+  .bar-phrase-repeat{display:flex;align-items:center;justify-content:center;align-self:center;
+    min-width:2.4rem;height:2.4rem;border-radius:999px;background:var(--accent);color:#1a1300;
+    font-size:1rem;font-weight:900;}
   .bar{
     background:var(--cell);border-radius:12px;min-width:84px;flex:0 0 auto;
     padding:.6rem .2rem;text-align:center;font-weight:800;font-size:var(--fs);

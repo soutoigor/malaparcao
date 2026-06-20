@@ -25,6 +25,13 @@ const NOTE_INDEX = {
 
 export function transposeChord(chord, steps) {
   if (chord === "%" || chord === "") return chord;
+  if (/\s/.test(chord.trim())) {
+    return chord
+      .trim()
+      .split(/\s+/)
+      .map((part) => transposeChord(part, steps))
+      .join(" ");
+  }
   if (steps % 12 === 0) return chord;
 
   const match = chord.match(/^([A-G][#b]?)(.*)$/);
@@ -62,6 +69,13 @@ export function transposeKey(key, steps) {
 
 export function prettyChord(chord) {
   if (chord === "%") return "<span>&#37;</span>";
+  if (/\s/.test(chord.trim())) {
+    return chord
+      .trim()
+      .split(/\s+/)
+      .map((part) => prettyChord(part))
+      .join(" ");
+  }
 
   let bass = "";
   let rootChord = chord;
