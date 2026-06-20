@@ -97,12 +97,12 @@ export const SONGS = [
           {label:"Base", rep:"x2", bars:["C","G","Am","F"]},
           {label:"Salida", bars:["Am","Dm","F","G"]}
         ]},
-      {name:"Verso 2", bars:["G","Am","F","C","G","Am","F","Am","Dm","F","G"]},
       {name:"Coro",
         parts:[
           {label:"Bucle", rep:"x2", bars:["F","G","Am"]},
           {label:"Salida", bars:["F","G","C","G","Am","Dm","G","F","G","C"]}
         ]},
+      {name:"Verso 2", bars:["G","Am","F","C","G","Am","F","Am","Dm","F","G"]},
       {name:"Coro final",
         parts:[
           {label:"Bucle", rep:"x2", bars:["F","G","Am"]},
