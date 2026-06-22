@@ -1,4 +1,4 @@
-import { FLOWS, SONGS } from "../data/songs.js?v=20260620-que-order";
+import { FLOWS, SONGS } from "../data/songs.js?v=20260622-lyrics-2";
 import { transposeChord, transposeKey, prettyChord } from "./chords.js";
 import { ICONS } from "./icons.js";
 
